@@ -153,7 +153,7 @@ public class ProductService {
             setProduct.setIsPreOrder(product.getIsPreOrder());
         }
 
-        if (!setProduct.getPreOrderEta().equals(product.getPreOrderEta())) {
+        if (product.getPreOrderEta() != null) {
             setProduct.setPreOrderEta(product.getPreOrderEta());
         }
 
