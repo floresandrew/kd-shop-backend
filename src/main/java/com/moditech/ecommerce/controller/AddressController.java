@@ -53,6 +53,16 @@ public class AddressController {
         }
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateAddress(@PathVariable String id, @RequestBody AddressDto addressDto) {
+        try {
+            addressService.updateAddress(id, addressDto);
+            return ResponseEntity.ok().body("Updated");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/default/address/{email}")
     public ResponseEntity<Address> getAddressByEmailAndDefault(@PathVariable String email) {
         Address address = addressService.getAddressByEmailAndDefault(email);

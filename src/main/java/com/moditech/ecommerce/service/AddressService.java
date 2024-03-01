@@ -38,6 +38,18 @@ public class AddressService {
         addressRepository.deleteById(id);
     }
 
+    public void updateAddress(String id, AddressDto addressDto) {
+        Address address = addressRepository.findById(id).orElse(null);
+        assert address != null;
+        address.setAddressLine1(addressDto.getAddressLine1());
+        address.setFullName(addressDto.getFullName());
+        address.setCity(addressDto.getCity());
+        address.setCountry(addressDto.getCountry());
+        address.setPostalCode(addressDto.getPostalCode());
+        address.setContactNumber(addressDto.getContactNumber());
+        addressRepository.save(address);
+    }
+
     public void setDefaultAddressByEmail(String email, String addressId) {
         // find the current default address for this email and set its isDefault to
         // false
