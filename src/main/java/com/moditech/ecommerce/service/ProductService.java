@@ -1,5 +1,6 @@
 package com.moditech.ecommerce.service;
 
+import com.moditech.ecommerce.dto.ProductDto;
 import com.moditech.ecommerce.model.Product;
 import com.moditech.ecommerce.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +117,7 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
-    public Product updateProduct(String id, Product product) {
+    public Product updateProduct(String id, ProductDto product) {
         Product setProduct = productRepository.findById(id).orElse(null);
 
         assert setProduct != null;

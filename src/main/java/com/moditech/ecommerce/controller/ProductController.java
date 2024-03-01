@@ -1,5 +1,6 @@
 package com.moditech.ecommerce.controller;
 
+import com.moditech.ecommerce.dto.ProductDto;
 import com.moditech.ecommerce.model.Product;
 import com.moditech.ecommerce.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,7 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    private ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody Product product) {
+    private ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody ProductDto product) {
         Product products = productService.updateProduct(id, product);
         return ResponseEntity.ok(products);
     }
