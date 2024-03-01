@@ -40,14 +40,35 @@ public class AddressService {
 
     public void updateAddress(String id, AddressDto addressDto) {
         Address address = addressRepository.findById(id).orElse(null);
-        assert address != null;
-        address.setAddressLine1(addressDto.getAddressLine1());
-        address.setFullName(addressDto.getFullName());
-        address.setCity(addressDto.getCity());
-        address.setCountry(addressDto.getCountry());
-        address.setPostalCode(addressDto.getPostalCode());
-        address.setContactNumber(addressDto.getContactNumber());
-        addressRepository.save(address);
+
+        if (address != null) {
+            // Check and update each field only if it has changed
+            if (addressDto.getAddressLine1() != null) {
+                address.setAddressLine1(addressDto.getAddressLine1());
+            }
+
+            if (addressDto.getFullName() != null) {
+                address.setFullName(addressDto.getFullName());
+            }
+
+            if (addressDto.getCity() != null) {
+                address.setCity(addressDto.getCity());
+            }
+
+            if (addressDto.getCountry() != null) {
+                address.setCountry(addressDto.getCountry());
+            }
+
+            if (addressDto.getPostalCode() != null) {
+                address.setPostalCode(addressDto.getPostalCode());
+            }
+
+            if (addressDto.getContactNumber() != null) {
+                address.setContactNumber(addressDto.getContactNumber());
+            }
+
+            addressRepository.save(address);
+        }
     }
 
     public void setDefaultAddressByEmail(String email, String addressId) {
