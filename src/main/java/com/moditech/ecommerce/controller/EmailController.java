@@ -1,5 +1,8 @@
 package com.moditech.ecommerce.controller;
 
+import com.moditech.ecommerce.dto.EmailVerificationRequest;
+import com.moditech.ecommerce.model.Email;
+import com.moditech.ecommerce.model.VerificationResult;
 import com.moditech.ecommerce.service.EmailService;
 import com.moditech.ecommerce.service.OrderService;
 import com.moditech.ecommerce.service.ProductService;
@@ -36,30 +39,30 @@ public class EmailController {
         return ResponseEntity.ok("Email sent");
     }
 
-    // @PostMapping("/sendCombinedEmail")
-    // private ResponseEntity<String> sendCombinedEmail(@RequestBody List<String>
-    // emails, HttpServletResponse response) throws IOException {
-    // // Use the provided list of emails
-    // List<OrderCountDto> top5Customers = orderService.getTop5Customers();
-    //
-    // // Extract emails from top 5 customers
-    // List<String> customerEmails =
-    // top5Customers.stream().map(OrderCountDto::getEmail).collect(Collectors.toList());
-    //
-    // List<TopSoldProductDto> topSoldProducts =
-    // productService.getTopSoldProducts();
-    // List<Product> productsWithinLastMonth =
-    // productService.getProductsWithinLastMonth();
-    //
-    // // Send combined email to the specified emails
-    // for (String customerEmail : customerEmails) {
-    // if (emails.contains(customerEmail)) {
-    // emailService.sendCombinedEmail(Collections.singletonList(customerEmail),
-    // topSoldProducts, productsWithinLastMonth);
-    // }
-    // }
-    //
-    // response.sendRedirect(frontEndBaseUrl);
-    // return ResponseEntity.ok("Emails sent to selected customers");
-    // }
+    @PostMapping("/send")
+    private ResponseEntity<String> sendEmail(@RequestBody Email email) {
+        emailService.sendOtpEmail(email.getEmail());
+        return ResponseEntity.ok("Email sent");
+    }
+
+    @PostMapping("/verifyOtp")
+    private ResponseEntity<String> verifyOtp(@RequestBody EmailVerificationRequest request) {
+        String email = request.getEmail();
+        String enteredOtp = request.getEnteredOtp();
+
+        System.out.println("enteredOtp: " + enteredOtp);
+
+        VerificationResult verificationResult = emailService.verifyOtp(email, enteredOtp);
+
+        switch (verificationResult.getStatus()) {
+            case SUCCESS:
+                return ResponseEntity.ok(verificationResult.getMessage());
+            case FAILURE:
+                return ResponseEntity.status(401).body(verificationResult.getMessage());
+            case ERROR:
+                return ResponseEntity.status(500).body(verificationResult.getMessage());
+            default:
+                return ResponseEntity.status(500).body("Unknown error");
+        }
+    }
 }

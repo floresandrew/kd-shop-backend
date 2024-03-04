@@ -43,7 +43,7 @@ public class UserController {
         return userService.getUserByEmail(email);
     }
 
-    @PutMapping("/changePassword/{email}")
+    @PatchMapping("/changePassword/{email}")
     public ResponseEntity<String> updatePassword(@PathVariable("email") String email, @RequestBody User user) {
         userService.updatePassword(email, user);
         return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);

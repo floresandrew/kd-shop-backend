@@ -1,21 +1,19 @@
 package com.moditech.ecommerce.service;
 
-import com.moditech.ecommerce.dto.TopSoldProductDto;
-import com.moditech.ecommerce.model.Product;
 import lombok.RequiredArgsConstructor;
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.util.List;
+import com.moditech.ecommerce.model.Email;
+import com.moditech.ecommerce.model.VerificationResult;
+import com.moditech.ecommerce.model.VerificationStatus;
+import com.moditech.ecommerce.repository.EmailRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +21,9 @@ public class EmailService {
 
     @Autowired
     private final JavaMailSender javaMailSender;
-    private final TemplateEngine templateEngine;
+
+    @Autowired
+    EmailRepository emailRepository;
 
     @Value("${spring.mail.username}")
     String adminEmail;
@@ -45,33 +45,52 @@ public class EmailService {
     }
 
     @Async
-    public void sendCombinedEmail(List<String> userEmails, List<TopSoldProductDto> topSoldProducts,
-            List<Product> productsWithinLastMonth) {
-        String subject = "Combined Products";
-        String htmlContent = generateCombinedProductsHtml(topSoldProducts, productsWithinLastMonth);
+    public void sendOtpEmail(String email) {
+        String subject = "OTP Verification Code";
+        String otp = generateRandomOtp();
+        String message = "Hi, \n \n Your OTP code from KDShop is here: " + otp + "\n \n Regards, \n KDShop";
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject(subject);
+        mailMessage.setText(message);
+        mailMessage.setFrom(adminEmail);
 
-        for (String userEmail : userEmails) {
-            try {
-                MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        Email emailObject = new Email();
+        emailObject.setEmail(email);
+        emailObject.setOtp(otp);
+        emailRepository.save(emailObject);
 
-                helper.setTo(userEmail);
-                helper.setSubject(subject);
-                helper.setText(htmlContent, true);
-                helper.setFrom(adminEmail);
-
-                javaMailSender.send(mimeMessage);
-            } catch (MessagingException e) {
-                e.printStackTrace();
-            }
-        }
+        javaMailSender.send(mailMessage);
     }
 
-    private String generateCombinedProductsHtml(List<TopSoldProductDto> topSoldProducts,
-            List<Product> productsWithinLastMonth) {
-        Context context = new Context();
-        context.setVariable("topSoldProducts", topSoldProducts);
-        context.setVariable("productsWithinLastMonth", productsWithinLastMonth);
-        return templateEngine.process("email-template", context);
+    private String generateRandomOtp() {
+        String characters = "0123456789";
+        Random random = new Random();
+        StringBuilder otp = new StringBuilder(6);
+        for (int i = 0; i < 6; i++) {
+            otp.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return otp.toString();
+    }
+
+    public VerificationResult verifyOtp(String email, String enteredOtp) {
+        try {
+            Email emailObject = emailRepository.findTopByEmailOrderByCreatedAtDesc(email);
+
+            System.out.println(emailObject.getEmail());
+
+            assert emailObject != null;
+
+            if (enteredOtp.equals(emailObject.getOtp())) {
+                return new VerificationResult(VerificationStatus.SUCCESS, "OTP is valid");
+            } else {
+                return new VerificationResult(VerificationStatus.FAILURE, "Invalid OTP");
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return new VerificationResult(VerificationStatus.ERROR, "Error verifying OTP");
+        }
     }
 }
