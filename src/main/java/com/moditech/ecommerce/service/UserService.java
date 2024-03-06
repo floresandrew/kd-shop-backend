@@ -47,7 +47,11 @@ public class UserService {
     }
 
     public void updateUserRole(String email, String userRole) {
+        System.out.println("userRole: " + userRole);
+        System.out.println("email: " + email);
         User user = userRepository.findByEmail(email);
+        assert user != null;
+        System.out.println("user Details: " + user);
         user.setUserRole(userRole);
         userRepository.save(user);
     }
