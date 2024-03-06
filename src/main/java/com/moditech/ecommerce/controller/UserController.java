@@ -56,8 +56,8 @@ public class UserController {
     }
 
     @PatchMapping("/update/userRole/{email}")
-    private void updateUserRole(@PathVariable String email, @RequestBody String role) {
-        userService.updateUserRole(email, role);
+    private void updateUserRole(@PathVariable String email, @RequestBody User user) {
+        userService.updateUserRole(email, user.getUserRole());
     }
 
 }
