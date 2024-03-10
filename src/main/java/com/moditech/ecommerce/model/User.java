@@ -21,7 +21,7 @@ public class User {
 
     private String password;
 
-    private String userRole = "ROLE_USER";
+    private String userRole;
 
     private String birthday;
 

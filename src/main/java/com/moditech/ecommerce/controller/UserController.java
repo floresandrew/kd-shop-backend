@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,8 +25,14 @@ public class UserController {
     String frontEndBaseUrl;
 
     @PostMapping("/register")
-    public User registerUser(@RequestBody User user) {
-        return userService.registerUser(user);
+    public ResponseEntity<User> registerUser(@RequestBody User user) {
+        try {
+            User registeredUser = userService.registerUser(user);
+            return ResponseEntity.ok(registeredUser);
+        } catch (ResponseStatusException e) {
+            // Catch the exception and return the appropriate HTTP response
+            return ResponseEntity.status(e.getStatus()).body(null);
+        }
     }
 
     @PostMapping("/login")
@@ -58,6 +65,12 @@ public class UserController {
     @PatchMapping("/update/userRole/{email}")
     private void updateUserRole(@PathVariable String email, @RequestBody User user) {
         userService.updateUserRole(email, user.getUserRole());
+    }
+
+    @GetMapping("/list/getByRole")
+    private ResponseEntity<List<User>> getUserByRole(@RequestParam String role) {
+        List<User> userList = userService.getUserByRole(role);
+        return ResponseEntity.ok(userList);
     }
 
 }

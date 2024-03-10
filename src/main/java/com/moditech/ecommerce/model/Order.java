@@ -26,7 +26,7 @@ public class Order {
 
     private String paymentStatus;
 
-    private String deliveryStatus = "Prepairing";
+    private String deliveryStatus = "Preparing";
 
     private String paymentMethod;
 
