@@ -67,6 +67,11 @@ public class UserController {
         userService.updateUserRole(email, user.getUserRole());
     }
 
+    @PatchMapping("/update/isEnable/{email}")
+    private void updateRoleStaffAccess(@PathVariable String email, @RequestBody User user) {
+        userService.updateRoleStaffIsEnable(email, user.getIsEnable());
+    }
+
     @GetMapping("/list/getByRole")
     private ResponseEntity<List<User>> getUserByRole(@RequestParam String role) {
         List<User> userList = userService.getUserByRole(role);

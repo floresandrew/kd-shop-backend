@@ -63,6 +63,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void updateRoleStaffIsEnable(String email, Boolean isEnable) {
+        User user = userRepository.findByEmail(email);
+        assert user != null;
+        user.setIsEnable(isEnable);
+        userRepository.save(user);
+    }
+
     public List<User> getListUser() {
         return userRepository.findAll();
     }
